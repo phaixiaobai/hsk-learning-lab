@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "HSK Master – 2/3/4 Trainer",
+  "short_name": "HSK Master",
+  "description": "Interactive HSK 2-4 Chinese prep with Pinyin, Thai & English translations, flashcards, quizzes and handwriting practice. Works offline.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#c1272d",
+  "background_color": "#ffffff",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png",           "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png",           "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Flashcards", "short_name": "Cards", "url": "./?m=flashcards", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Writing Pad", "short_name": "Write", "url": "./?m=writing",   "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

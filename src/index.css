@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Root styling ──────────────────────────────────────────────── */
+html, body, #root { height: 100%; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;      /* prevent iOS bounce */
+}
+
+/* Large hanzi should always use the Chinese font stack */
+.font-hanzi { font-family: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', serif; }
+.font-thai  { font-family: 'Noto Sans Thai', 'Sarabun', system-ui, sans-serif; }
+
+/* Hide horizontal scrollbar on the tabs strip */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+/* Ensure Apple Pencil / touch input works cleanly on the writing pad */
+.touch-none { touch-action: none; }

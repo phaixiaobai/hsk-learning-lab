@@ -1,0 +1,19 @@
+[
+  { "id": "pt2_1", "level": 2, "prompt": "Which character means \"already\"?",          "promptTh": "ตัวอักษรใดแปลว่า \"แล้ว/เรียบร้อย\"?", "hanzi": "已经", "choices": ["已经","晚上","运动","让"],   "answerIndex": 0 },
+  { "id": "pt2_2", "level": 2, "prompt": "Pick the hanzi for \"cheap\".",                 "promptTh": "เลือกตัวอักษรที่แปลว่า \"ถูก\"",      "hanzi": "便宜", "choices": ["新","便宜","公司","火车"], "answerIndex": 1 },
+  { "id": "pt2_3", "level": 2, "prompt": "Which character means \"to feel/think\"?",     "promptTh": "ตัวอักษรใดแปลว่า \"รู้สึก/คิดว่า\"?",  "hanzi": "觉得", "choices": ["穿","觉得","问题","晚上"], "answerIndex": 1 },
+  { "id": "pt2_4", "level": 2, "prompt": "Pick the hanzi for \"because\".",               "promptTh": "เลือกตัวอักษรที่แปลว่า \"เพราะว่า\"",   "hanzi": "因为", "choices": ["所以","可能","因为","时间"], "answerIndex": 2 },
+  { "id": "pt2_5", "level": 2, "prompt": "Which character means \"company\"?",            "promptTh": "ตัวอักษรใดแปลว่า \"บริษัท\"?",        "hanzi": "公司", "choices": ["火车","运动","公司","问题"], "answerIndex": 2 },
+
+  { "id": "pt3_1", "level": 3, "prompt": "Which character means \"hardworking\"?",        "promptTh": "ตัวอักษรใดแปลว่า \"ขยัน\"?",         "hanzi": "努力", "choices": ["努力","满意","简单","机会"], "answerIndex": 0 },
+  { "id": "pt3_2", "level": 3, "prompt": "Pick the hanzi for \"environment\".",           "promptTh": "เลือกตัวอักษรที่แปลว่า \"สิ่งแวดล้อม\"", "hanzi": "环境", "choices": ["经验","环境","习惯","礼物"], "answerIndex": 1 },
+  { "id": "pt3_3", "level": 3, "prompt": "Which character means \"to solve\"?",           "promptTh": "ตัวอักษรใดแปลว่า \"แก้ปัญหา\"?",      "hanzi": "解决", "choices": ["关心","计划","解决","准备"], "answerIndex": 2 },
+  { "id": "pt3_4", "level": 3, "prompt": "Pick the hanzi for \"opportunity\".",           "promptTh": "เลือกตัวอักษรที่แปลว่า \"โอกาส\"",      "hanzi": "机会", "choices": ["故事","安静","影响","机会"], "answerIndex": 3 },
+  { "id": "pt3_5", "level": 3, "prompt": "Which character means \"actually\"?",           "promptTh": "ตัวอักษรใดแปลว่า \"ที่จริงแล้ว\"?",    "hanzi": "其实", "choices": ["其实","健康","放心","满意"], "answerIndex": 0 },
+
+  { "id": "pt4_1", "level": 4, "prompt": "Which character means \"to persist\"?",         "promptTh": "ตัวอักษรใดแปลว่า \"ยืนหยัด\"?",       "hanzi": "坚持", "choices": ["坚持","压力","后悔","估计"], "answerIndex": 0 },
+  { "id": "pt4_2", "level": 4, "prompt": "Pick the hanzi for \"society\".",               "promptTh": "เลือกตัวอักษรที่แปลว่า \"สังคม\"",      "hanzi": "社会", "choices": ["社会","积极","效果","性格"], "answerIndex": 0 },
+  { "id": "pt4_3", "level": 4, "prompt": "Which character means \"responsibility\"?",     "promptTh": "ตัวอักษรใดแปลว่า \"ความรับผิดชอบ\"?", "hanzi": "责任", "choices": ["邀请","责任","鼓励","理解"], "answerIndex": 1 },
+  { "id": "pt4_4", "level": 4, "prompt": "Pick the hanzi for \"suitable\".",               "promptTh": "เลือกตัวอักษรที่แปลว่า \"เหมาะสม\"",     "hanzi": "合适", "choices": ["详细","优秀","合适","复杂"], "answerIndex": 2 },
+  { "id": "pt4_5", "level": 4, "prompt": "Which character means \"to respect\"?",         "promptTh": "ตัวอักษรใดแปลว่า \"เคารพ\"?",         "hanzi": "尊重", "choices": ["竞争","鼓励","邀请","尊重"], "answerIndex": 3 }
+]
