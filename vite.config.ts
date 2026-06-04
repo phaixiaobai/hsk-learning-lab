@@ -20,9 +20,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'HSK Master – 2/3/4 Trainer',
-        short_name: 'HSK Master',
-        description: 'Interactive HSK 2-4 prep with flashcards, quizzes, and handwriting practice.',
+        name: 'HSK Lab – Mandarin Learning Platform',
+        short_name: 'HSK Lab',
+        description: 'Interactive HSK 2-4 Mandarin learning with flashcards, voice quiz, writing, and analytics.',
         theme_color: '#c1272d',
         background_color: '#ffffff',
         display: 'standalone',

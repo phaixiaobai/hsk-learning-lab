@@ -2,11 +2,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import vocab from '../data/vocabulary.json';
 import type { HskLevel, QuizQuestion, SectionScore, VocabItem } from '../types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useStudySession } from '../hooks/useStudySession';
 import { Button } from '../components/ui/Button';
 import { Card, CardSubtitle, CardTitle } from '../components/ui/Card';
+import { AudioButton } from '../components/ui/AudioButton';
 import { UiLang } from '../components/ui/LanguageToggle';
 import { getSections, makeSectionKey } from '../utils/sections';
 import { generateQuiz } from '../utils/quizGenerator';
+import { translationLines } from '../utils/translation';
+import { posLabel } from '../utils/pos';
+import { MatchingMode } from './quiz/modes/MatchingMode';
 
 /* ================================================================
  * Module B – Flashcards
@@ -16,13 +21,34 @@ import { generateQuiz } from '../utils/quizGenerator';
  * ================================================================ */
 
 type StudyMode = 'study' | 'quiz' | 'result';
-type ViewMode  = 'section' | 'random' | 'review';
+type ViewMode  = 'section' | 'random' | 'review' | 'custom';
+
+/** A completed random study round, kept for session history + analytics. */
+interface RandomSession {
+  date: string;       // ISO timestamp
+  level: HskLevel;
+  total: number;      // cards studied
+  known: number;      // marked "Got It"
+  accuracy: number;   // 0–100
+}
+
+/** How many words make up one random study section. */
+const RANDOM_SIZE = 20;
 
 interface Props {
   level: HskLevel;
   lang: UiLang;
   section: number;
   onSectionChange: (n: number) => void;
+  /** When set, overrides normal section/random browsing with a specific word set. */
+  customDeck?: VocabItem[];
+  customDeckLabel?: string;
+  /** Called to advance to the next chunk (category-based auto-advance). */
+  onNextChunk?: () => void;
+  /** Whether a next chunk is available for auto-advance. */
+  hasNextChunk?: boolean;
+  /** Called when user exits custom mode back to vocab browser. */
+  onClearCustomDeck?: () => void;
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -34,17 +60,37 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-export function Flashcards({ level, lang, section, onSectionChange }: Props) {
+export function Flashcards({
+  level, lang, section, onSectionChange,
+  customDeck, customDeckLabel, onNextChunk, hasNextChunk, onClearCustomDeck,
+}: Props) {
+  useStudySession(level);   // track study time for analytics
   const allVocab   = vocab as VocabItem[];
   const levelWords = useMemo(() => allVocab.filter(v => v.level === level), [level]);
   const sections   = useMemo(() => getSections(level, allVocab), [level]);
 
   const sectionIdx = Math.min(Math.max(0, section), Math.max(0, sections.length - 1));
-  const sectionDeck = sections[sectionIdx] ?? [];
+  const currentSection = sections[sectionIdx];
+  const sectionDeck = currentSection?.words ?? [];
 
   // ── View mode ──
-  const [viewMode, setViewMode]         = useState<ViewMode>('section');
-  const [shuffledDeck, setShuffledDeck] = useState<VocabItem[]>([]);
+  // Start in 'custom' if a custom deck was injected from VocabBrowser
+  const [viewMode, setViewMode]         = useState<ViewMode>(customDeck ? 'custom' : 'section');
+
+  // ── Random mode (structured: one fixed 20-word section at a time) ──
+  const [randomDeck,     setRandomDeck]     = useState<VocabItem[]>([]);
+  const [randomKnown,    setRandomKnown]    = useState(0);
+  const [randomReviewed, setRandomReviewed] = useState(0);
+  const [randomComplete, setRandomComplete] = useState(false);
+  const [randomRound,    setRandomRound]    = useState(0);
+  // Session history is read by the Analytics module straight from localStorage;
+  // here we only ever append, so the read binding is intentionally omitted.
+  const [, setRandomSessions] = useLocalStorage<RandomSession[]>(
+    'hsk-master:random-sessions', [],
+  );
+
+  // Track how many custom cards the user has gone through (for completion banner)
+  const [customSeenCount, setCustomSeenCount] = useState(0);
 
   // ── Persistent ──
   const [reviewIds, setReviewIds] = useLocalStorage<string[]>('hsk-master:review', []);
@@ -56,8 +102,10 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
   );
 
   // Active deck depends on mode
-  const activeDeck = viewMode === 'section' ? sectionDeck
-    : viewMode === 'random' ? shuffledDeck
+  const activeDeck =
+    viewMode === 'custom'  ? (customDeck ?? [])
+    : viewMode === 'section' ? sectionDeck
+    : viewMode === 'random'  ? randomDeck
     : reviewDeck;
 
   // ── Shared card state ──
@@ -69,7 +117,8 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [qIdx,      setQIdx]      = useState(0);
   const [picked,    setPicked]    = useState<string | null>(null);
-  const [matchSels, setMatchSels] = useState<Record<string, string>>({});
+  // matchSels kept for legacy reset (no longer drives matching UI)
+  const [, setMatchSels] = useState<Record<string, string>>({});
   const scoreRef    = useRef(0);
   const [displayScore, setDisplayScore] = useState(0);
 
@@ -77,12 +126,20 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
     'hsk-master:section-scores', {},
   );
 
+  // Sections the user has studied (flipped through) but not necessarily quizzed.
+  // Studying marks a section "studied"; passing its quiz marks it "completed".
+  // Written here; the Progress page reads it to show "studied" vs "completed".
+  const [, setStudiedSections] = useLocalStorage<string[]>(
+    'hsk-master:studied-sections', [],
+  );
+
   // Reset everything on level change (keep viewMode so Review stays active across levels)
   useEffect(() => {
     setCardIdx(0);
     setRevealed(false);
     setStudyMode('study');
-    setShuffledDeck([]);
+    setRandomDeck([]);
+    setRandomComplete(false);
   }, [level]);
 
   // Reset card index on section change (section mode)
@@ -94,6 +151,14 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
     }
   }, [sectionIdx]);
 
+  // Mark a section "studied" once the learner reaches and reveals its last card.
+  useEffect(() => {
+    if (viewMode !== 'section' || !revealed) return;
+    if (sectionDeck.length === 0 || cardIdx < sectionDeck.length - 1) return;
+    const key = makeSectionKey(level, sectionIdx);
+    setStudiedSections(prev => (prev.includes(key) ? prev : [...prev, key]));
+  }, [viewMode, revealed, cardIdx, sectionDeck.length, level, sectionIdx, setStudiedSections]);
+
   const card = activeDeck[cardIdx] ?? null;
   const sKey = makeSectionKey(level, sectionIdx);
   const myScores = sectionScores[sKey] ?? [];
@@ -102,9 +167,19 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
     : null;
 
   /* ─── View-mode switches ─── */
+  /** Build a fresh 20-word random section and reset round counters. */
+  function startRandomRound() {
+    setRandomDeck(shuffleArray(levelWords).slice(0, RANDOM_SIZE));
+    setRandomKnown(0);
+    setRandomReviewed(0);
+    setRandomComplete(false);
+    setCardIdx(0);
+    setRevealed(false);
+    setStudyMode('study');
+    setRandomRound(r => r + 1);
+  }
   function enterRandom() {
-    setShuffledDeck(shuffleArray(levelWords));
-    setCardIdx(0); setRevealed(false); setStudyMode('study');
+    startRandomRound();
     setViewMode('random');
   }
   function enterSection() {
@@ -115,19 +190,46 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
     setCardIdx(0); setRevealed(false); setStudyMode('study');
     setViewMode('review');
   }
-  function reshuffle() {
-    setShuffledDeck(shuffleArray(levelWords));
-    setCardIdx(0); setRevealed(false);
+  function exitCustomMode() {
+    onClearCustomDeck?.();
+    enterSection();
   }
 
   /* ─── Card actions ─── */
+  /**
+   * Random mode advances through a fixed 20-card section and STOPS at the end
+   * (no infinite looping). Records the result, then either advances or finalises
+   * the round and stores a session-history entry.
+   */
+  function advanceRandom(known: boolean) {
+    const newKnown    = randomKnown + (known ? 1 : 0);
+    const newReviewed = randomReviewed + (known ? 0 : 1);
+    setRandomKnown(newKnown);
+    setRandomReviewed(newReviewed);
+    setRevealed(false);
+
+    const isLast = cardIdx >= randomDeck.length - 1;
+    if (isLast) {
+      const total    = randomDeck.length;
+      const accuracy = total > 0 ? Math.round((newKnown / total) * 100) : 0;
+      setRandomSessions(prev =>
+        [{ date: new Date().toISOString(), level, total, known: newKnown, accuracy }, ...prev].slice(0, 50),
+      );
+      setRandomComplete(true);
+    } else {
+      setCardIdx(i => i + 1);
+    }
+  }
+
   function markReview() {
     if (card && !reviewIds.includes(card.id)) setReviewIds([...reviewIds, card.id]);
+    if (viewMode === 'random') { advanceRandom(false); return; }
     nextCard();
   }
   function markKnown() {
     if (!card) return;
     setReviewIds(reviewIds.filter(id => id !== card.id));
+    if (viewMode === 'random') { advanceRandom(true); return; }
     if (viewMode === 'review') {
       // Deck shrinks by 1; stay at same index (it now points at the next word).
       // If this was the last card, clamp to 0 (will show empty state).
@@ -139,7 +241,9 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
   }
   function nextCard() {
     setRevealed(false);
-    // Guard: if deck is empty avoid % 0
+    if (viewMode === 'custom') {
+      setCustomSeenCount(n => n + 1);
+    }
     setCardIdx(i => activeDeck.length <= 1 ? 0 : (i + 1) % activeDeck.length);
   }
 
@@ -153,6 +257,23 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
       level,
       pool: sectionDeck,
       totalQuestions: Math.min(10, sectionDeck.length),
+      lang,
+    });
+    setQuestions(qs);
+    setQIdx(0);
+    scoreRef.current = 0;
+    setPicked(null);
+    setMatchSels({});
+    setStudyMode('quiz');
+  }
+
+  function startCustomQuiz() {
+    const pool = customDeck ?? [];
+    const qs = generateQuiz(allVocab, {
+      level,
+      pool,
+      totalQuestions: Math.min(10, pool.length),
+      lang,
     });
     setQuestions(qs);
     setQIdx(0);
@@ -187,6 +308,28 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
     }, 700);
   }
 
+  /** Instant advance for MatchingMode (which already shows its own review panel). */
+  function commitMatchingAnswer(isCorrect: boolean) {
+    if (isCorrect) scoreRef.current++;
+    const nextQ = qIdx + 1;
+    if (nextQ >= questions.length) {
+      const final = scoreRef.current;
+      setDisplayScore(final);
+      const entry: SectionScore = {
+        score: final,
+        total: questions.length,
+        date: new Date().toISOString(),
+      };
+      setSectionScores(prev => ({
+        ...prev,
+        [sKey]: [entry, ...(prev[sKey] ?? [])].slice(0, 10),
+      }));
+      setStudyMode('result');
+    } else {
+      setQIdx(nextQ);
+    }
+  }
+
   /* ============================================================
    * Render: Section quiz mode
    * ============================================================ */
@@ -198,8 +341,14 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
         <Card padded={false} className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Section Quiz · HSK {level}</CardTitle>
-              <CardSubtitle>Section {sectionIdx + 1} · Q {qIdx + 1} / {questions.length}</CardSubtitle>
+              <CardTitle>
+                {viewMode === 'custom' ? (customDeckLabel ?? 'Custom Set') : `Section Quiz · HSK ${level}`}
+              </CardTitle>
+              <CardSubtitle>
+                {viewMode === 'custom'
+                  ? `Q ${qIdx + 1} / ${questions.length}`
+                  : `${currentSection?.label ?? `Section ${sectionIdx + 1}`} · Q ${qIdx + 1} / ${questions.length}`}
+              </CardSubtitle>
             </div>
             <Button variant="ghost" className="px-4" onClick={() => setStudyMode('study')}>✕ Exit</Button>
           </div>
@@ -251,8 +400,12 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
           )}
 
           {q.kind === 'matching' && (
-            <MatchingBlock pairs={q.pairs} selections={matchSels}
-              setSelections={setMatchSels} onSubmit={commitAnswer} />
+            <MatchingMode
+              question={q}
+              lang={lang}
+              showReviewPins={false}
+              onAnswer={(isCorrect) => commitMatchingAnswer(isCorrect)}
+            />
           )}
         </Card>
       </div>
@@ -271,8 +424,12 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
 
     return (
       <Card>
-        <CardTitle>Section Quiz Complete! 🎉</CardTitle>
-        <CardSubtitle>Section {sectionIdx + 1} · HSK {level}</CardSubtitle>
+        <CardTitle>Quiz Complete! 🎉</CardTitle>
+        <CardSubtitle>
+          {viewMode === 'custom'
+            ? (customDeckLabel ?? 'Custom Set')
+            : `${currentSection?.label ?? `Section ${sectionIdx + 1}`} · HSK ${level}`}
+        </CardSubtitle>
 
         <div className="text-center my-8">
           <div className="text-6xl font-extrabold text-brand">{displayScore}/{total}</div>
@@ -291,14 +448,24 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
         </p>
 
         <div className="grid grid-cols-2 gap-3 mt-6">
-          <Button size="lg" variant="secondary" onClick={startQuiz}>↻ Retry Quiz</Button>
+          <Button size="lg" variant="secondary"
+            onClick={viewMode === 'custom' ? startCustomQuiz : startQuiz}>
+            ↻ Retry Quiz
+          </Button>
           <Button size="lg" onClick={() => setStudyMode('study')}>← Back to Cards</Button>
         </div>
-        {sectionIdx < sections.length - 1 && (
-          <div className="mt-3">
-            <Button full size="lg" variant="ghost"
+        {viewMode !== 'custom' && sectionIdx < sections.length - 1 && (
+          <div className="mt-4 rounded-2xl border-2 border-brand/30 bg-brand/5 p-4 text-center">
+            <div className="text-sm font-bold text-brand">
+              ✅ {currentSection?.label ?? `Section ${sectionIdx + 1}`} complete
+            </div>
+            <div className="text-xs text-ink-soft mt-0.5 mb-3">
+              Recommended next: <strong>{sections[sectionIdx + 1]?.label}</strong>
+              {sections[sectionIdx + 1] && <> ({sections[sectionIdx + 1].range})</>}
+            </div>
+            <Button full size="lg"
               onClick={() => { onSectionChange(sectionIdx + 1); setStudyMode('study'); }}>
-              Next Section →
+              Continue to {sections[sectionIdx + 1]?.label} →
             </Button>
           </div>
         )}
@@ -307,8 +474,123 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
   }
 
   /* ============================================================
+   * Render: Random section complete
+   * After all 20 cards are studied the round ends with a summary —
+   * the user must tap "Next Random Section" to get a new set.
+   * ============================================================ */
+  if (viewMode === 'random' && randomComplete) {
+    const total    = randomDeck.length;
+    const accuracy = total > 0 ? Math.round((randomKnown / total) * 100) : 0;
+    return (
+      <div className="space-y-4">
+        <Card padded={false} className="p-4 sm:p-5">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <CardTitle>Flashcards · HSK {level}</CardTitle>
+              <CardSubtitle>Random · Section {randomRound}</CardSubtitle>
+            </div>
+            <div className="inline-flex rounded-2xl border border-ink/10 bg-white p-1 flex-shrink-0">
+              {(
+                [
+                  { id: 'section', label: '📚 Section', fn: enterSection },
+                  { id: 'random',  label: '🔀 Random',  fn: enterRandom  },
+                  { id: 'review',  label: `📌 Review${reviewDeck.length > 0 ? ` (${reviewDeck.length})` : ''}`, fn: enterReview },
+                ] as const
+              ).map(m => (
+                <button key={m.id} onClick={m.fn}
+                  className={
+                    'min-h-[36px] px-3 rounded-xl text-sm font-semibold transition whitespace-nowrap ' +
+                    (viewMode === m.id ? 'bg-brand text-white' : 'text-ink-soft hover:bg-ink/5')
+                  }
+                >{m.label}</button>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        <Card className="text-center py-10">
+          <div className="text-5xl mb-4">🎉</div>
+          <CardTitle>Section Complete</CardTitle>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 max-w-sm mx-auto">
+            <div className="bg-ink/5 rounded-2xl p-4">
+              <div className="text-3xl font-extrabold text-ink">{total}</div>
+              <div className="text-xs text-ink-soft mt-0.5">Words Studied</div>
+            </div>
+            <div className="bg-brand-light/40 rounded-2xl p-4">
+              <div className="text-3xl font-extrabold text-brand">{accuracy}%</div>
+              <div className="text-xs text-ink-soft mt-0.5">Accuracy</div>
+            </div>
+          </div>
+          <p className="text-ink-soft text-sm mt-3">
+            ✅ {randomKnown} got it · 📌 {randomReviewed} to review
+          </p>
+
+          <div className="mt-8 flex flex-col gap-3 max-w-xs mx-auto">
+            <Button full size="lg" onClick={startRandomRound}>
+              🔀 Next Random Section
+            </Button>
+            <Button full size="lg" variant="ghost" onClick={enterSection}>
+              📚 Back to Sections
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  /* ============================================================
    * Render: Study mode (section OR random)
    * ============================================================ */
+  /* ============================================================
+   * Render: Custom deck completion banner
+   * Shows after the user cycles through all custom cards once.
+   * ============================================================ */
+  const customDone = viewMode === 'custom' && customSeenCount >= (customDeck?.length ?? 1);
+
+  if (customDone) {
+    return (
+      <div className="space-y-4">
+        {/* Header */}
+        <Card padded={false} className="p-4 sm:p-5">
+          <div className="flex items-center gap-3">
+            <button onClick={exitCustomMode} className="text-ink-soft hover:text-ink transition-colors p-1">
+              ← Back
+            </button>
+            <div>
+              <CardTitle>Flashcards</CardTitle>
+              <CardSubtitle>{customDeckLabel ?? 'Custom Set'}</CardSubtitle>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="text-center py-10">
+          <div className="text-5xl mb-4">🎉</div>
+          <CardTitle>Set Complete!</CardTitle>
+          <CardSubtitle className="mt-2">
+            You've reviewed all {customDeck?.length} cards in{' '}
+            <strong>{customDeckLabel ?? 'this set'}</strong>.
+          </CardSubtitle>
+
+          <div className="mt-8 flex flex-col gap-3 max-w-xs mx-auto">
+            {hasNextChunk && onNextChunk && (
+              <Button full size="lg" onClick={onNextChunk}>
+                ➡ Study Next Part
+              </Button>
+            )}
+            <Button full size="lg" variant="secondary"
+              onClick={() => { setCardIdx(0); setCustomSeenCount(0); setRevealed(false); }}>
+              🔄 Repeat This Set
+            </Button>
+            <Button full size="lg" variant="ghost" onClick={exitCustomMode}>
+              ← Back to Vocabulary
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   // Empty state for review mode with no flagged words
   if (viewMode === 'review' && reviewDeck.length === 0) {
     return (
@@ -357,7 +639,36 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* ── Mode toggle bar ── */}
+      {/* ── Custom mode header ── */}
+      {viewMode === 'custom' && (
+        <Card padded={false} className="p-4 sm:p-5">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                onClick={exitCustomMode}
+                className="text-ink-soft hover:text-ink transition-colors p-1 flex-shrink-0"
+                aria-label="Back to vocabulary"
+              >
+                ←
+              </button>
+              <div className="min-w-0">
+                <CardTitle className="truncate">{customDeckLabel ?? 'Custom Set'}</CardTitle>
+                <CardSubtitle>
+                  Card {cardIdx + 1} of {activeDeck.length}
+                  {customSeenCount > 0 && (
+                    <span className="ml-2 text-emerald-600 font-semibold">
+                      · {customSeenCount} reviewed
+                    </span>
+                  )}
+                </CardSubtitle>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* ── Mode toggle bar (only shown in non-custom modes) ── */}
+      {viewMode !== 'custom' && (
       <Card padded={false} className="p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           {/* Left: title + subtitle */}
@@ -365,15 +676,19 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
             <CardTitle>Flashcards · HSK {level}</CardTitle>
             {viewMode === 'section' && (
               <CardSubtitle>
-                Section {sectionIdx + 1} of {sections.length}
-                &nbsp;·&nbsp;Words {sectionIdx * 15 + 1}–{sectionIdx * 15 + sectionDeck.length}
+                <span className="font-bold text-ink">{currentSection?.label ?? `Section ${sectionIdx + 1}`}</span>
+                {currentSection && <>&nbsp;<span className="text-ink-soft">({currentSection.range})</span></>}
+                &nbsp;·&nbsp;{sectionDeck.length} words
+                &nbsp;·&nbsp;Section {sectionIdx + 1}/{sections.length}
                 {bestPct !== null && (
-                  <span className="ml-3 font-semibold text-emerald-600">Best: {bestPct}%</span>
+                  <span className="ml-3 font-semibold text-emerald-600">{bestPct}% mastered</span>
                 )}
               </CardSubtitle>
             )}
             {viewMode === 'random' && (
-              <CardSubtitle>Random · Card {cardIdx + 1} of {shuffledDeck.length}</CardSubtitle>
+              <CardSubtitle>
+                Random Section {randomRound} · Card {cardIdx + 1} of {randomDeck.length}
+              </CardSubtitle>
             )}
             {viewMode === 'review' && (
               <CardSubtitle>
@@ -417,16 +732,16 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
           </div>
         )}
 
-        {/* Random mode: progress bar + reshuffle */}
-        {viewMode === 'random' && (
+        {/* Random mode: fixed-section progress (no infinite loop) */}
+        {viewMode === 'random' && randomDeck.length > 0 && (
           <div className="flex items-center gap-3 mt-3">
             <div className="flex-1 h-2 bg-ink/10 rounded-full overflow-hidden">
               <div className="h-full bg-brand transition-all"
-                style={{ width: `${Math.round(((cardIdx + 1) / shuffledDeck.length) * 100)}%` }} />
+                style={{ width: `${Math.round(((cardIdx + 1) / randomDeck.length) * 100)}%` }} />
             </div>
-            <Button variant="ghost" onClick={reshuffle} className="px-4 text-sm flex-shrink-0">
-              🔀 Reshuffle
-            </Button>
+            <span className="text-xs text-ink-soft flex-shrink-0 tabular-nums">
+              {cardIdx + 1} / {randomDeck.length}
+            </span>
           </div>
         )}
 
@@ -441,14 +756,17 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
           </div>
         )}
       </Card>
+      )}  {/* end viewMode !== 'custom' */}
 
       {/* ── Card ── */}
       <Card>
         <div className="flex items-center justify-between mb-2">
           <span className="text-ink-soft font-semibold">
-            {viewMode === 'section'
+            {viewMode === 'custom'
+              ? `Card ${cardIdx + 1} / ${activeDeck.length}`
+              : viewMode === 'section'
               ? `Card ${cardIdx + 1} / ${sectionDeck.length}`
-              : `${cardIdx + 1} / ${shuffledDeck.length}`}
+              : `${cardIdx + 1} / ${activeDeck.length}`}
           </span>
           {isReview && (
             <span className="text-sm bg-amber-100 text-amber-700 font-semibold px-3 py-1 rounded-full">
@@ -457,10 +775,10 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
           )}
         </div>
 
-        {/* Dot indicator (section mode only – 15 dots is manageable) */}
-        {viewMode === 'section' && (
+        {/* Dot indicators — section mode and custom mode */}
+        {(viewMode === 'section' || viewMode === 'custom') && (
           <div className="flex gap-1 flex-wrap mb-4">
-            {sectionDeck.map((w, i) => (
+            {activeDeck.map((w, i) => (
               <div key={i} className={
                 'w-2.5 h-2.5 rounded-full transition ' +
                 (i === cardIdx ? 'bg-brand scale-125'
@@ -486,13 +804,59 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
             {card.hanzi}
           </div>
           {revealed ? (
-            <div className="mt-6">
-              <div className="text-2xl sm:text-3xl text-brand font-bold tracking-wide">{card.pinyin}</div>
-              {(lang === 'en' || lang === 'both') && (
-                <div className="text-xl text-ink mt-2">{card.en}</div>
-              )}
-              {(lang === 'th' || lang === 'both') && card.th && (
-                <div className="text-xl text-ink font-thai mt-1">{card.th}</div>
+            <div className="mt-6 flex flex-col items-center gap-3 w-full px-2">
+              {/* Audio buttons */}
+              <div className="flex gap-3">
+                <AudioButton text={card.hanzi} size="lg" className="mb-1" />
+                <AudioButton text={card.hanzi} size="lg" slow className="mb-1" />
+              </div>
+              {/* Pinyin + part of speech */}
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <div className="text-2xl sm:text-3xl text-brand font-bold tracking-wide text-center">
+                  {card.pinyin}
+                </div>
+                {card.pos && (
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft bg-ink/5 border border-ink/10 rounded-full px-2 py-0.5">
+                    {posLabel(card.pos)}
+                  </span>
+                )}
+              </div>
+              {/* Translations — centralized: never blank, consistent fallback */}
+              <div className="flex flex-col items-center gap-1">
+                {translationLines(card, lang).map((line, i) => (
+                  <div
+                    key={i}
+                    className={[
+                      'text-center leading-snug max-w-xs',
+                      i === 0 ? 'text-xl text-ink' : 'text-base text-ink-soft',
+                      line.lang === 'th' ? 'font-thai' : '',
+                    ].join(' ')}
+                  >
+                    {line.text}
+                  </div>
+                ))}
+              </div>
+
+              {/* Example sentence — Chinese / pinyin / translation(s) */}
+              {card.exampleZh && (
+                <div className="mt-2 w-full max-w-sm rounded-2xl bg-ink/3 border border-ink/8 px-4 py-3 text-center">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-ink-soft mb-1">Example</div>
+                  <div className="font-hanzi text-xl text-ink leading-snug">{card.exampleZh}</div>
+                  {card.examplePinyin && (
+                    <div className="text-sm text-brand mt-1">{card.examplePinyin}</div>
+                  )}
+                  {translationLines(
+                    { en: card.exampleEn ?? '', th: card.exampleTh ?? '' },
+                    lang,
+                  ).map((line, i) => (
+                    <div
+                      key={i}
+                      className={['text-sm text-ink-soft mt-0.5', line.lang === 'th' ? 'font-thai' : ''].join(' ')}
+                    >
+                      {line.text}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           ) : (
@@ -505,11 +869,22 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
           <Button size="lg" variant="success"  onClick={markKnown}>✅ Got It</Button>
         </div>
 
-        {/* Quiz button (section mode only — not meaningful in random/review) */}
+        {/* Quiz button — section mode and custom mode */}
         {viewMode === 'section' && (
-          <div className="mt-4">
+          <div className="mt-4 space-y-2">
             <Button full size="lg" variant="secondary" onClick={startQuiz}>
               🧠 Quiz This Section
+            </Button>
+            <p className="text-[11px] text-ink-soft text-center leading-snug px-2">
+              ℹ️ Studying flashcards only marks this section as <strong>studied</strong>.
+              Complete the quiz to fully <strong>complete</strong> the section.
+            </p>
+          </div>
+        )}
+        {viewMode === 'custom' && (customDeck?.length ?? 0) >= 2 && (
+          <div className="mt-4">
+            <Button full size="lg" variant="secondary" onClick={startCustomQuiz}>
+              🧠 Quiz This Part
             </Button>
           </div>
         )}
@@ -518,62 +893,3 @@ export function Flashcards({ level, lang, section, onSectionChange }: Props) {
   );
 }
 
-/* ─── Matching sub-component ─── */
-function MatchingBlock({
-  pairs, selections, setSelections, onSubmit,
-}: {
-  pairs: { hanzi: string; meaning: string }[];
-  selections: Record<string, string>;
-  setSelections: (s: Record<string, string>) => void;
-  onSubmit: (correct: boolean) => void;
-}) {
-  const meanings = useMemo(
-    () => pairs.map(p => p.meaning).sort(() => Math.random() - 0.5),
-    [pairs],
-  );
-  const allMatched = pairs.every(p => selections[p.hanzi]);
-
-  function check() {
-    onSubmit(pairs.every(p => selections[p.hanzi] === p.meaning));
-  }
-
-  return (
-    <div>
-      <p className="text-ink-soft mb-3">Tap a hanzi, then tap its meaning.</p>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          {pairs.map(p => (
-            <div key={p.hanzi} className="rounded-2xl bg-white border-2 border-ink/10 p-4 flex items-center justify-between">
-              <span className="font-hanzi text-2xl">{p.hanzi}</span>
-              <span className="text-brand font-semibold">{selections[p.hanzi] ?? '—'}</span>
-            </div>
-          ))}
-        </div>
-        <div className="space-y-2">
-          {meanings.map(m => {
-            const used = Object.values(selections).includes(m);
-            return (
-              <button key={m} disabled={used}
-                onClick={() => {
-                  const target = pairs.find(p => !selections[p.hanzi]);
-                  if (target) setSelections({ ...selections, [target.hanzi]: m });
-                }}
-                className={
-                  'w-full rounded-2xl p-4 text-left font-medium ' +
-                  (used ? 'bg-ink/10 text-ink-soft line-through'
-                        : 'bg-white border-2 border-ink/10 hover:border-brand/40')
-                }
-              >
-                {m}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      <div className="mt-4 flex gap-3">
-        <Button variant="ghost" onClick={() => setSelections({})}>Reset</Button>
-        <Button onClick={check} disabled={!allMatched}>Submit Match</Button>
-      </div>
-    </div>
-  );
-}

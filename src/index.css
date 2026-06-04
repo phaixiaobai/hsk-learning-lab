@@ -22,3 +22,39 @@ body {
 
 /* Ensure Apple Pencil / touch input works cleanly on the writing pad */
 .touch-none { touch-action: none; }
+
+/* iOS safe area padding for bottom tab bar */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── Quiz interaction animations ──────────────────────────────── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0);   }
+  15%       { transform: translateX(-7px); }
+  35%       { transform: translateX( 7px); }
+  55%       { transform: translateX(-4px); }
+  75%       { transform: translateX( 4px); }
+}
+.animate-shake { animation: shake 0.45s ease-in-out both; }
+
+@keyframes flash-correct {
+  0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+  40%  { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0.45); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+.animate-flash-correct { animation: flash-correct 0.5s ease-out both; }
+
+@keyframes pop-in {
+  0%   { transform: scale(0.92); opacity: 0.6; }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1);    opacity: 1;   }
+}
+.animate-pop { animation: pop-in 0.22s ease-out both; }
+
+/* Tone-colour helpers (used in pinyin display) */
+.tone-1 { color: #dc2626; }   /* 1st tone – red    */
+.tone-2 { color: #d97706; }   /* 2nd tone – amber  */
+.tone-3 { color: #16a34a; }   /* 3rd tone – green  */
+.tone-4 { color: #2563eb; }   /* 4th tone – blue   */
+.tone-5 { color: #6b7280; }   /* neutral  – gray   */

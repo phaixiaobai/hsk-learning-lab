@@ -81,7 +81,7 @@ export function Progress({ level, onNavigate }: Props) {
 
       {/* Section grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sections.map((sectionWords, i) => {
+        {sections.map((section, i) => {
           const key    = makeSectionKey(activeLevel, i);
           const scores = sectionScores[key] ?? [];
           const best   = scores.length > 0
@@ -94,10 +94,10 @@ export function Progress({ level, onNavigate }: Props) {
           return (
             <SectionCard
               key={key}
-              sectionNum={i + 1}
-              wordStart={i * 15 + 1}
-              wordEnd={i * 15 + sectionWords.length}
-              preview={sectionWords.slice(0, 4).map(w => w.hanzi)}
+              label={section.label}
+              range={section.range}
+              wordCount={section.words.length}
+              preview={section.words.slice(0, 4).map(w => w.hanzi)}
               bestPct={best}
               attempts={scores.length}
               lastDate={lastDate}
@@ -131,12 +131,12 @@ function StatBadge({ label, value }: { label: string; value: string }) {
 
 /* ─── Section card ─── */
 function SectionCard({
-  sectionNum, wordStart, wordEnd, preview,
+  label, range, wordCount, preview,
   bestPct, attempts, lastDate, gradientClass, onStudy,
 }: {
-  sectionNum: number;
-  wordStart: number;
-  wordEnd: number;
+  label: string;
+  range: string;
+  wordCount: number;
   preview: string[];
   bestPct: number | null;
   attempts: number;
@@ -145,6 +145,7 @@ function SectionCard({
   onStudy: () => void;
 }) {
   const notStarted = bestPct === null;
+  const status = notStarted ? 'Not started' : bestPct >= 80 ? 'Mastered' : 'In progress';
   const color = notStarted ? 'gray'
     : bestPct >= 80 ? 'emerald'
     : bestPct >= 50 ? 'amber'
@@ -168,8 +169,8 @@ function SectionCard({
     <div className={`rounded-3xl overflow-hidden border border-ink/5 shadow-sm bg-white`}>
       {/* Colored top bar */}
       <div className={`bg-gradient-to-r ${gradientClass} px-5 py-3 flex items-center justify-between`}>
-        <span className="text-white font-bold text-sm">Section {sectionNum}</span>
-        <span className="text-white/80 text-xs">Words {wordStart}–{wordEnd}</span>
+        <span className="text-white font-bold text-sm">{label} <span className="font-normal text-white/80">· {range}</span></span>
+        <span className="text-white/80 text-xs">{wordCount} words · {status}</span>
       </div>
 
       <div className="p-4">

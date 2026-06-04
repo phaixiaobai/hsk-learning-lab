@@ -32,7 +32,7 @@ export function Tabs({ items, value, onChange }: Props) {
             aria-selected={active}
             onClick={() => onChange(t.id)}
             className={
-              'whitespace-nowrap min-h-touch px-5 rounded-2xl font-semibold text-base transition ' +
+              'whitespace-nowrap min-h-[44px] px-3 lg:px-5 rounded-2xl font-semibold text-sm transition ' +
               (active
                 ? 'bg-brand text-white shadow-md'
                 : 'bg-white text-ink border border-ink/10 hover:border-brand/40')

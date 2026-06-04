@@ -5,6 +5,7 @@ import { analyzeSentence } from '../utils/sentenceAnalyzer';
 import { Button } from '../components/ui/Button';
 import { Card, CardSubtitle, CardTitle } from '../components/ui/Card';
 import { UiLang } from '../components/ui/LanguageToggle';
+import { translationLines } from '../utils/translation';
 
 interface Props { lang: UiLang; }
 
@@ -61,12 +62,11 @@ export function SentenceAnalyzer({ lang }: Props) {
             {t.known && t.item ? (
               <div className="flex-1">
                 <div className="font-bold text-brand">{t.item.pinyin}</div>
-                {(lang === 'en' || lang === 'both') && (
-                  <div className="text-ink">{t.item.en}</div>
-                )}
-                {(lang === 'th' || lang === 'both') && (
-                  <div className="text-ink font-thai">{t.item.th}</div>
-                )}
+                {translationLines(t.item, lang).map((line, li) => (
+                  <div key={li} className={['text-ink', line.lang === 'th' ? 'font-thai' : ''].join(' ')}>
+                    {line.text}
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="flex-1 text-ink-soft italic">Not in HSK 2-4 bank</div>

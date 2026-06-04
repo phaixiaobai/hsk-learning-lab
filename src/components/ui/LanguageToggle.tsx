@@ -18,7 +18,7 @@ export function LanguageToggle({ value, onChange }: Props) {
           key={o.id}
           onClick={() => onChange(o.id)}
           className={
-            'min-h-[44px] px-4 rounded-xl text-sm font-semibold transition ' +
+            'min-h-[40px] sm:min-h-[44px] px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold transition ' +
             (value === o.id ? 'bg-brand text-white' : 'text-ink-soft hover:bg-ink/5')
           }
         >

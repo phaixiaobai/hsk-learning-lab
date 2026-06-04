@@ -1,16 +1,18 @@
 {
-  "name": "hsk-master-pwa",
+  "name": "hsk-lab",
   "private": true,
   "version": "1.0.0",
-  "description": "HSK 2-4 Chinese Language Proficiency Preparation PWA",
+  "description": "HSK Lab – Interactive Mandarin Learning Platform",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && echo 'Copy dist/ to any static host'"
+    "deploy": "npm run build && echo 'Copy dist/ to any static host'",
+    "test": "sucrase-node scripts/tests/index.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "hanzi-writer": "^3.7.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

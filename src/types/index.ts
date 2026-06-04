@@ -10,8 +10,12 @@ export type HskLevel = 2 | 3 | 4;
 export interface VocabItem {
   /** Stable unique id, e.g. "hsk3_1". Used as a key in localStorage "review" lists. */
   id: string;
-  /** Simplified Chinese character(s). */
+  /** Primary Chinese character(s) shown on cards (simplified). */
   hanzi: string;
+  /** Simplified Chinese character(s). Mirrors `hanzi` for the current dataset. */
+  simplified?: string;
+  /** Traditional Chinese character(s), when available. */
+  traditional?: string;
   /** Pinyin with tone marks. */
   pinyin: string;
   /** English translation. */
@@ -20,8 +24,26 @@ export interface VocabItem {
   th: string;
   /** HSK level – 2, 3 or 4. */
   level: HskLevel;
-  /** Optional part-of-speech tag for the analyzer. */
-  pos?: 'noun' | 'verb' | 'adj' | 'adv' | 'pron' | 'conj' | 'particle' | 'num' | 'measure';
+  /**
+   * Part-of-speech tag, stored verbatim from the source spreadsheet
+   * (e.g. "n", "v", "v/n", "prep"). Kept as a free-form string so no
+   * source information is lost.
+   */
+  pos?: string;
+  /** Semantic category id. Empty when derived at runtime (see categoryUtils). */
+  category?: string;
+  /** Example sentence in Chinese, when available. */
+  example?: string;
+  /** Translation of the example sentence, when available. */
+  exampleTranslation?: string;
+  /** Example sentence in Chinese (canonical field; `example` mirrors this). */
+  exampleZh?: string;
+  /** Pinyin of the example sentence (tone-marked). */
+  examplePinyin?: string;
+  /** English translation of the example sentence. */
+  exampleEn?: string;
+  /** Thai translation of the example sentence. */
+  exampleTh?: string;
 }
 
 /** A pre-test question. Stored separately from main vocab so we can hand-craft it. */
@@ -51,6 +73,7 @@ export type QuizQuestion =
       id: string;
       prompt: string;          // e.g., 'What does 努力 mean?'
       hanzi: string;
+      word: VocabItem;         // the full vocab item being tested
       choices: { text: string; correct: boolean }[];
     }
   | {
@@ -58,12 +81,24 @@ export type QuizQuestion =
       id: string;
       sentence: string;        // sentence with "___"
       hanzi: string;           // the missing word (the answer)
+      word: VocabItem;         // the full vocab item being tested
       choices: { text: string; correct: boolean }[];
     }
   | {
       kind: 'matching';
       id: string;
       pairs: { hanzi: string; meaning: string }[];
+      words: VocabItem[];      // the 4 vocab items forming the pairs
+    }
+  | {
+      kind: 'voice';
+      id: string;
+      word: VocabItem;         // the word to speak aloud
+    }
+  | {
+      kind: 'writing';
+      id: string;
+      word: VocabItem;         // prompt with meaning + pinyin, user writes the hanzi
     };
 
 /** Result of one quiz attempt – stored for high-score history. */
@@ -79,4 +114,28 @@ export interface SectionScore {
   score: number;
   total: number;
   date: string;
+}
+
+// ── Support / feedback ────────────────────────────────────────────────────
+
+/** Support ticket submitted via the floating SupportWidget. */
+export interface SupportTicket {
+  id?: string;
+  category: string;
+  message: string;
+  page_url: string;
+  browser_info: string;
+  screenshot_base64?: string;
+  anonymous: boolean;
+  status?: 'open' | 'reviewing' | 'resolved' | 'closed';
+  created_at?: string;
+}
+
+// ── Category analytics ────────────────────────────────────────────────────
+
+/** Per-category accuracy stored in localStorage hsk-lab:cat-scores. */
+export interface CategoryScore {
+  correct: number;
+  total: number;
+  lastSeen: string;
 }

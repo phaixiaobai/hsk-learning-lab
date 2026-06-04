@@ -4,6 +4,7 @@ import vocab from '../data/vocabulary.json';
 import type { HskLevel, VocabItem } from '../types';
 import { Button } from '../components/ui/Button';
 import { Card, CardSubtitle, CardTitle } from '../components/ui/Card';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 /**
  * Module E – Interactive Writing Pad
@@ -29,6 +30,13 @@ export function WritingPad({ level }: Props) {
   const [charIdx,      setCharIdx]      = useState(0);
   const [mode,  setMode]  = useState<'animate' | 'quiz'>('animate');
   const [ghost, setGhost] = useState(true);
+
+  // Track words the user has completed in quiz mode.
+  // ProgressSection reads this via 'hsk-master:written-words' to show Writing progress.
+  // Only the setter is needed here; the read side is consumed by ProgressSection.
+  const [, setWrittenWords] = useLocalStorage<string[]>(
+    'hsk-master:written-words', [],
+  );
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const writerRef    = useRef<HanziWriter | null>(null);
@@ -72,7 +80,17 @@ export function WritingPad({ level }: Props) {
 
     writerRef.current = writer;
     if (mode === 'animate') writer.animateCharacter();
-    if (mode === 'quiz')    writer.quiz({ showHintAfterMisses: 2 });
+    if (mode === 'quiz') {
+      writer.quiz({
+        showHintAfterMisses: 2,
+        onComplete: () => {
+          // Mark the word as written so ProgressSection can show Writing progress.
+          setWrittenWords(prev =>
+            prev.includes(selectedWord.id) ? prev : [...prev, selectedWord.id],
+          );
+        },
+      });
+    }
 
     return () => {
       if (containerRef.current) containerRef.current.innerHTML = '';
