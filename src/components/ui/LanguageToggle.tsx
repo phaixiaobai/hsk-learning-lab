@@ -6,10 +6,10 @@ interface Props {
 }
 
 export function LanguageToggle({ value, onChange }: Props) {
-  const opts: { id: UiLang; label: string }[] = [
-    { id: 'en',   label: 'EN'    },
-    { id: 'th',   label: 'ไทย'  },
-    { id: 'both', label: 'EN+TH' },
+  const opts: { id: UiLang; label: string; short: string }[] = [
+    { id: 'en',   label: 'EN',    short: 'EN'  },
+    { id: 'th',   label: 'ไทย',  short: 'TH'  },
+    { id: 'both', label: 'EN+TH', short: '+TH' },
   ];
   return (
     <div className="inline-flex rounded-2xl border border-ink/10 bg-white p-1">
@@ -18,11 +18,13 @@ export function LanguageToggle({ value, onChange }: Props) {
           key={o.id}
           onClick={() => onChange(o.id)}
           className={
-            'min-h-[40px] sm:min-h-[44px] px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold transition ' +
+            'min-h-[36px] sm:min-h-[44px] px-1.5 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold transition ' +
             (value === o.id ? 'bg-brand text-white' : 'text-ink-soft hover:bg-ink/5')
           }
         >
-          {o.label}
+          {/* Short label on phone, full label on tablet+ */}
+          <span className="sm:hidden">{o.short}</span>
+          <span className="hidden sm:inline">{o.label}</span>
         </button>
       ))}
     </div>
