@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 627" width="1200" height="627">
+  <defs>
+    <linearGradient id="bggrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="50%" style="stop-color:#16213e"/>
+      <stop offset="100%" style="stop-color:#0f3460"/>
+    </linearGradient>
+    <linearGradient id="redgrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c1272d"/>
+      <stop offset="100%" style="stop-color:#8d1b20"/>
+    </linearGradient>
+    <linearGradient id="cardgrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.08)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.03)"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="softglow">
+      <feDropShadow dx="0" dy="0" stdDeviation="16" flood-color="#c1272d" flood-opacity="0.5"/>
+    </filter>
+    <filter id="cardshadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="24" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <clipPath id="roundclip">
+      <rect width="1200" height="627" rx="0"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="627" fill="url(#bggrad)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="980" cy="100" r="280" fill="#c1272d" opacity="0.06"/>
+  <circle cx="1100" cy="500" r="200" fill="#3b82f6" opacity="0.05"/>
+  <circle cx="100" cy="550" r="180" fill="#8b5cf6" opacity="0.05"/>
+
+  <!-- Grid overlay -->
+  <pattern id="dotgrid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="1" fill="white" opacity="0.06"/>
+  </pattern>
+  <rect width="1200" height="627" fill="url(#dotgrid)"/>
+
+  <!-- Left: main content -->
+  <!-- Logo + name row -->
+  <rect x="72" y="72" width="64" height="64" rx="18" fill="url(#redgrad)" filter="url(#softglow)"/>
+  <text x="104" y="117" font-family="'PingFang SC','Noto Sans SC','Microsoft YaHei',serif" font-size="38" font-weight="900" fill="white" text-anchor="middle">汉</text>
+
+  <text x="152" y="100" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="600" fill="#c1272d" letter-spacing="3">HSK LAB</text>
+  <text x="152" y="122" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" fill="rgba(255,255,255,0.4)">Open Source · MIT License</text>
+
+  <!-- Main headline -->
+  <text x="72" y="210" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="52" font-weight="800" fill="white" letter-spacing="-1">Learn Mandarin</text>
+  <text x="72" y="270" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="52" font-weight="800" fill="white" letter-spacing="-1">the <tspan fill="#c1272d">smart</tspan> way</text>
+
+  <!-- Subtitle -->
+  <text x="72" y="316" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="17" fill="rgba(255,255,255,0.6)" font-weight="400">HSK 2 · 3 · 4 trainer — 656 words · Voice quiz · Writing pad · EN+TH</text>
+
+  <!-- Divider -->
+  <line x1="72" y1="346" x2="340" y2="346" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+
+  <!-- Feature list -->
+  <text x="72" y="376" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="14" fill="rgba(255,255,255,0.75)">🗂️  Vocabulary Browser · Progress Tracker</text>
+  <text x="72" y="404" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="14" fill="rgba(255,255,255,0.75)">🎤  AI Voice Quiz · Tone Recognition · Score Feedback</text>
+  <text x="72" y="432" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="14" fill="rgba(255,255,255,0.75)">✍️  HanziWriter Stroke Practice · Free Draw Mode</text>
+  <text x="72" y="460" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="14" fill="rgba(255,255,255,0.75)">🧩  6 Quiz Modes · Azure Neural TTS · PWA Offline</text>
+
+  <!-- Tech badges -->
+  <rect x="72" y="490" width="76" height="26" rx="13" fill="rgba(97,218,251,0.15)" stroke="rgba(97,218,251,0.3)" stroke-width="1"/>
+  <text x="110" y="507" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#61dafb" text-anchor="middle">React 18</text>
+
+  <rect x="156" y="490" width="90" height="26" rx="13" fill="rgba(49,120,198,0.15)" stroke="rgba(49,120,198,0.3)" stroke-width="1"/>
+  <text x="201" y="507" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#4f9cf9" text-anchor="middle">TypeScript</text>
+
+  <rect x="254" y="490" width="72" height="26" rx="13" fill="rgba(100,108,255,0.15)" stroke="rgba(100,108,255,0.3)" stroke-width="1"/>
+  <text x="290" y="507" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#818cf8" text-anchor="middle">Vite</text>
+
+  <rect x="334" y="490" width="82" height="26" rx="13" fill="rgba(62,207,142,0.15)" stroke="rgba(62,207,142,0.3)" stroke-width="1"/>
+  <text x="375" y="507" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#3ecf8e" text-anchor="middle">Supabase</text>
+
+  <rect x="424" y="490" width="56" height="26" rx="13" fill="rgba(193,39,45,0.2)" stroke="rgba(193,39,45,0.4)" stroke-width="1"/>
+  <text x="452" y="507" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#f87171" text-anchor="middle">PWA</text>
+
+  <!-- URL -->
+  <text x="72" y="565" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" fill="rgba(255,255,255,0.35)">🌐  hsk-app-fawn.vercel.app  ·  github.com/phaixiaobai/hsk-learning-lab</text>
+
+  <!-- Right: UI preview card -->
+  <rect x="680" y="60" width="460" height="507" rx="24" fill="url(#cardgrad)" stroke="rgba(255,255,255,0.08)" stroke-width="1" filter="url(#cardshadow)"/>
+
+  <!-- App header mock -->
+  <rect x="680" y="60" width="460" height="58" rx="0" fill="rgba(255,255,255,0.05)"/>
+  <rect x="680" y="60" width="460" height="58" rx="0" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <rect x="680" y="60" width="460" height="4" rx="0" fill="url(#redgrad)" opacity="0.6"/>
+
+  <!-- Header: logo + title -->
+  <rect x="700" y="74" width="30" height="30" rx="8" fill="url(#redgrad)"/>
+  <text x="715" y="95" font-family="'PingFang SC','Noto Sans SC',serif" font-size="16" font-weight="900" fill="white" text-anchor="middle">汉</text>
+  <text x="740" y="88" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="white">HSK Lab</text>
+  <text x="740" y="103" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="rgba(255,255,255,0.45)">HSK 2 · 3 · 4 Trainer</text>
+
+  <!-- Level buttons -->
+  <rect x="980" y="72" width="50" height="28" rx="14" fill="url(#redgrad)"/>
+  <text x="1005" y="90" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">HSK 2</text>
+  <text x="1065" y="90" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="500" fill="rgba(255,255,255,0.4)" text-anchor="middle">HSK 3</text>
+  <text x="1115" y="90" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="500" fill="rgba(255,255,255,0.4)" text-anchor="middle">HSK 4</text>
+
+  <!-- Tab bar -->
+  <rect x="680" y="118" width="460" height="38" fill="rgba(255,255,255,0.03)"/>
+  <!-- Active tab -->
+  <rect x="698" y="125" width="66" height="24" rx="12" fill="url(#redgrad)"/>
+  <text x="731" y="141" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="600" fill="white" text-anchor="middle">🗂️ Vocab</text>
+  <!-- Other tabs -->
+  <text x="790" y="141" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.45)" text-anchor="middle">🎴 Cards</text>
+  <text x="848" y="141" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.45)" text-anchor="middle">✍️ Write</text>
+  <text x="902" y="141" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.45)" text-anchor="middle">🧩 Quiz</text>
+  <text x="960" y="141" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.45)" text-anchor="middle">📈 Stats</text>
+  <text x="1020" y="141" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.45)" text-anchor="middle">🎯 Level</text>
+
+  <!-- Content: section cards grid -->
+  <text x="700" y="178" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.6)">PROGRESS TRACKER · HSK 2</text>
+
+  <!-- HSK 2 card -->
+  <rect x="700" y="188" width="130" height="90" rx="14" fill="url(#cardgrad)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <rect x="700" y="188" width="130" height="32" rx="14" fill="#22c55e" opacity="0.9"/>
+  <rect x="700" y="204" width="130" height="16" fill="#22c55e" opacity="0.9"/>
+  <text x="765" y="210" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="800" fill="white" text-anchor="middle">HSK 2</text>
+  <text x="765" y="226" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">175 words · 20 sections</text>
+  <text x="710" y="246" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">🎴 Flashcards</text>
+  <text x="790" y="246" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">✍️ Writing</text>
+  <text x="710" y="260" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">🧩 Quiz</text>
+  <text x="790" y="260" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">✅ Complete</text>
+  <!-- Progress bar -->
+  <rect x="710" y="268" width="110" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+  <rect x="710" y="268" width="30" height="4" rx="2" fill="#22c55e"/>
+
+  <!-- HSK 3 card -->
+  <rect x="840" y="188" width="130" height="90" rx="14" fill="url(#cardgrad)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <rect x="840" y="188" width="130" height="32" rx="14" fill="#3b82f6" opacity="0.9"/>
+  <rect x="840" y="204" width="130" height="16" fill="#3b82f6" opacity="0.9"/>
+  <text x="905" y="210" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="800" fill="white" text-anchor="middle">HSK 3</text>
+  <text x="905" y="226" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">187 words · 24 sections</text>
+  <text x="850" y="246" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">🎴 Flashcards</text>
+  <text x="930" y="246" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">✍️ Writing</text>
+  <text x="850" y="260" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">🧩 Quiz</text>
+  <text x="930" y="260" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">✅ Complete</text>
+  <rect x="850" y="268" width="110" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+  <rect x="850" y="268" width="18" height="4" rx="2" fill="#3b82f6"/>
+
+  <!-- HSK 4 card -->
+  <rect x="980" y="188" width="144" height="90" rx="14" fill="url(#cardgrad)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <rect x="980" y="188" width="144" height="32" rx="14" fill="#8b5cf6" opacity="0.9"/>
+  <rect x="980" y="204" width="144" height="16" fill="#8b5cf6" opacity="0.9"/>
+  <text x="1052" y="210" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="800" fill="white" text-anchor="middle">HSK 4</text>
+  <text x="1052" y="226" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">294 words · 24 sections</text>
+  <text x="990" y="246" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">🎴 Flashcards</text>
+  <text x="1075" y="246" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">✍️ Writing</text>
+  <text x="990" y="260" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">🧩 Quiz</text>
+  <text x="1075" y="260" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">✅ Complete</text>
+  <rect x="990" y="268" width="124" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+  <rect x="990" y="268" width="8" height="4" rx="2" fill="#8b5cf6"/>
+
+  <!-- Flashcard preview -->
+  <text x="700" y="306" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.6)">FLASHCARD</text>
+  <rect x="700" y="316" width="180" height="130" rx="14" fill="rgba(193,39,45,0.08)" stroke="rgba(193,39,45,0.25)" stroke-width="1.5"/>
+  <text x="790" y="388" font-family="'PingFang SC','Noto Sans SC','Microsoft YaHei',serif" font-size="72" font-weight="700" fill="white" text-anchor="middle" opacity="0.9">把</text>
+  <text x="790" y="408" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.35)" text-anchor="middle">bǎ · particle for object</text>
+  <!-- Buttons -->
+  <rect x="705" y="426" width="82" height="16" rx="8" fill="rgba(193,39,45,0.6)"/>
+  <text x="746" y="437" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" font-weight="600" fill="white" text-anchor="middle">📌 Need Review</text>
+  <rect x="793" y="426" width="82" height="16" rx="8" fill="rgba(22,163,74,0.6)"/>
+  <text x="834" y="437" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" font-weight="600" fill="white" text-anchor="middle">✅ Got It</text>
+
+  <!-- Voice quiz preview -->
+  <text x="896" y="306" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.6)">VOICE QUIZ</text>
+  <rect x="896" y="316" width="228" height="130" rx="14" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.25)" stroke-width="1.5"/>
+  <text x="1010" y="355" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="rgba(255,255,255,0.5)" text-anchor="middle">Say this word:</text>
+  <text x="1010" y="392" font-family="'PingFang SC','Noto Sans SC','Microsoft YaHei',serif" font-size="44" font-weight="700" fill="white" text-anchor="middle">学习</text>
+  <!-- Mic button -->
+  <circle cx="1010" cy="428" r="14" fill="rgba(139,92,246,0.5)" stroke="rgba(139,92,246,0.7)" stroke-width="1.5"/>
+  <text x="1010" y="433" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="14" text-anchor="middle">🎤</text>
+
+  <!-- Score bar -->
+  <text x="700" y="466" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.6)">PRONUNCIATION SCORE</text>
+  <rect x="700" y="476" width="420" height="8" rx="4" fill="rgba(255,255,255,0.08)"/>
+  <rect x="700" y="476" width="336" height="8" rx="4" fill="#22c55e" opacity="0.8"/>
+  <text x="1128" y="484" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#22c55e" text-anchor="middle">80%</text>
+
+  <!-- Sub scores -->
+  <text x="700" y="504" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Pronunciation</text>
+  <text x="700" y="518" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="600" fill="#22c55e">90%</text>
+  <text x="780" y="504" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Tone</text>
+  <text x="780" y="518" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="600" fill="#f59e0b">72%</text>
+  <text x="840" y="504" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Transcript</text>
+  <text x="840" y="518" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="600" fill="#22c55e">100%</text>
+
+  <!-- Writing pad preview -->
+  <text x="700" y="546" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.6)">WRITING PAD · STROKE ORDER</text>
+  <rect x="700" y="552" width="420" height="8" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <!-- Stroke dots -->
+  <circle cx="720" cy="556" r="3" fill="#c1272d" opacity="0.8"/>
+  <circle cx="740" cy="556" r="3" fill="#c1272d" opacity="0.6"/>
+  <circle cx="760" cy="556" r="3" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="780" cy="556" r="3" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="800" cy="556" r="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="850" y="560" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="rgba(255,255,255,0.3)">stroke 2 of 8 · HanziWriter</text>
+
+  <!-- Bottom border -->
+  <rect x="680" y="563" width="460" height="4" rx="0" fill="url(#redgrad)" opacity="0.5"/>
+</svg>

@@ -126,20 +126,20 @@
   <rect x="858" y="230" width="260" height="140" rx="20" fill="white" stroke="#f3f4f6" stroke-width="1"/>
   <text x="888" y="258" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#6b7280">🗂️ VOCAB BROWSER · 656 WORDS</text>
   <!-- Section cards -->
-  <rect x="878" y="268" width="72" height="56" rx="12" fill="#3b82f6"/>
-  <text x="914" y="289" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="800" fill="white" text-anchor="middle">B1</text>
-  <text x="914" y="305" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="white" text-anchor="middle" opacity="0.85">8 Words</text>
-  <text x="914" y="318" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="white" text-anchor="middle" opacity="0.7">Not started</text>
+  <rect x="878" y="268" width="72" height="56" rx="12" fill="#22c55e"/>
+  <text x="914" y="287" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="800" fill="white" text-anchor="middle">HSK 2</text>
+  <text x="914" y="302" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="white" text-anchor="middle" opacity="0.85">175 Words</text>
+  <text x="914" y="316" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="white" text-anchor="middle" opacity="0.75">20 sections</text>
 
-  <rect x="958" y="268" width="72" height="56" rx="12" fill="#8b5cf6"/>
-  <text x="994" y="289" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="800" fill="white" text-anchor="middle">C1</text>
-  <text x="994" y="305" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="white" text-anchor="middle" opacity="0.85">7 Words</text>
-  <text x="994" y="318" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="white" text-anchor="middle" opacity="0.7">Not started</text>
+  <rect x="958" y="268" width="72" height="56" rx="12" fill="#3b82f6"/>
+  <text x="994" y="287" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="800" fill="white" text-anchor="middle">HSK 3</text>
+  <text x="994" y="302" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="white" text-anchor="middle" opacity="0.85">187 Words</text>
+  <text x="994" y="316" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="white" text-anchor="middle" opacity="0.75">24 sections</text>
 
-  <rect x="1038" y="268" width="72" height="56" rx="12" fill="#ef4444"/>
-  <text x="1074" y="289" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="800" fill="white" text-anchor="middle">D1</text>
-  <text x="1074" y="305" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="white" text-anchor="middle" opacity="0.85">11 Words</text>
-  <text x="1074" y="318" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="white" text-anchor="middle" opacity="0.7">Not started</text>
+  <rect x="1038" y="268" width="72" height="56" rx="12" fill="#8b5cf6"/>
+  <text x="1074" y="287" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="800" fill="white" text-anchor="middle">HSK 4</text>
+  <text x="1074" y="302" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="white" text-anchor="middle" opacity="0.85">294 Words</text>
+  <text x="1074" y="316" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="8" fill="white" text-anchor="middle" opacity="0.75">24 sections</text>
 
   <!-- Stat row -->
   <text x="878" y="348" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">HSK 2 · 3 · 4  ·  20 sections  ·  English + Thai</text>
