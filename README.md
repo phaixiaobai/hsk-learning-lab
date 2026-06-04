@@ -1,9 +1,27 @@
-# HSK Lab — HSK 2 / 3 / 4 Mandarin Trainer
+<div align="center">
 
-An interactive Progressive Web App (PWA) for learning Mandarin at HSK 2–4 level.
-Dual translations in **English + Thai**. Works offline. Installable on any device.
+<img src="docs/assets/banner.svg" alt="HSK Lab Banner" width="100%"/>
 
-**Live:** https://hsk-app-fawn.vercel.app
+<br/>
+
+[![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white&labelColor=20232a)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)](https://vitejs.dev)
+[![Tailwind](https://img.shields.io/badge/Tailwind-3-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ecf8e?logo=supabase&logoColor=white)](https://supabase.com)
+[![PWA](https://img.shields.io/badge/PWA-Offline_Ready-5a0fc8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)](https://hsk-app-fawn.vercel.app)
+
+**[🌐 Live Demo](https://hsk-app-fawn.vercel.app)**  ·  中文 / English / ภาษาไทย
+
+</div>
+
+---
+
+## What is HSK Lab?
+
+Interactive Mandarin learning PWA for HSK 2–4 students.
+Dual translations **English + Thai**. Works offline. Installable on any device.
 
 ---
 
@@ -66,11 +84,11 @@ Both are optional — app runs fully client-side without them.
 
 ## Database Setup (Supabase)
 
-Run these SQL files in Supabase SQL Editor in order:
+Run in Supabase SQL Editor **in order**:
 
 ```
 supabase/schema.sql           # core tables
-supabase/feedback-schema.sql  # feedback tables (run after schema.sql)
+supabase/feedback-schema.sql  # feedback tables
 ```
 
 ---
@@ -112,7 +130,7 @@ src/
 
 ## Admin Dashboard
 
-Access: `https://your-url/?admin=1` → **Performance** tab
+Access: append `?admin=1` to any URL → go to **Performance** tab.
 
 Shows aggregated feedback:
 - Voice score accuracy per word
@@ -120,7 +138,7 @@ Shows aggregated feedback:
 - Words users find difficult
 - Post-quiz ratings and comments
 
-Requires Supabase + `feedback-schema.sql`.
+Requires Supabase + `feedback-schema.sql` applied.
 
 ---
 
