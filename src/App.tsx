@@ -202,7 +202,7 @@ export default function App() {
 
         {tab === 'writing' && (
           <TabPanel>
-            <WritingPad level={level} />
+            <WritingPad level={level} section={flashcardSection} />
           </TabPanel>
         )}
 
